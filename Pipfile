@@ -10,7 +10,6 @@ tldextract = "*"
 praw = "*"
 psaw = "*"
 tqdm = "*"
-newspaper = "*"
 newspaper3k = "*"
 
 [requires]
