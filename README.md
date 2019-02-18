@@ -6,6 +6,11 @@ This project is a clone of the GPT-2 WebText dataset as outlined in the [OpenAI 
 
 Pipenv, Python 3,
 
+To install python dependencies:
+```
+pipenv install
+```
+
 [Newspaper](https://github.com/codelucas/newspaper#get-it-now) Dependencies:
 
 On Ubuntu:
