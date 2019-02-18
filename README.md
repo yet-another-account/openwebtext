@@ -21,13 +21,13 @@ brew install libxml2 libxslt
 1. Get list of URLs from reddit:
 
 ```
-python3 get_urls.py
+pipenv run python get_urls.py
 ```
 
 2. Download data from URLs:
 
 ```
-python3 download.py
+pipenv run python download.py
 ```
 
 Resulting files will be deposited in `data/` with format `{domain}-{sha256 hash of url}.txt`.
