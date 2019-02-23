@@ -19,14 +19,17 @@ def dl(url):
     url = url.strip()
 
     if should_exclude(url):
-        continue
+        return
 
     ext = tldextract.extract(url)
     domain = '.'.join([x for x in ext if x])
 
+    fname = 'data/{}-{}.txt'.format(domain, hash(url.encode()).hexdigest())
+    if os.path.isfile(fname):
+        return
 #    print('Downloading', url)
     try:
-        article = newspaper.Article(url)
+        article = newspaper.Article(url, fetch_images=False)
         article.download()
         article.parse()
     except newspaper.article.ArticleException:
@@ -36,8 +39,7 @@ def dl(url):
 
     text = article.text
 
-    fname = 'data/{}-{}.txt'.format(domain, hash(url.encode()).hexdigest())
-
+    
     if text.strip() == '':
 #        print('Empty')
         return
