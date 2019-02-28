@@ -19,7 +19,10 @@ def chunks(l, n, s=0):
     """Yield successive n-sized chunks from l, skipping the first s chunks."""
     if isinstance(l, collections.Iterable):
         chnk = []
-        for elem in l:
+        for i, elem in enumerate(l):
+            if i < s:
+                continue
+
             chnk.append(elem)
             if len(chnk) == n:
                 yield chnk
@@ -28,7 +31,7 @@ def chunks(l, n, s=0):
             yield chnk
 
     else:
-        for i in range(s * n, len(l), n):
+        for i in range(s, len(l), n):
             yield l[i : i + n]
 
 

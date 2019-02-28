@@ -267,15 +267,17 @@ if __name__ == "__main__":
         conn = sqlite_conn()
         cur = conn.cursor()
 
-    start_chnk = load_state(args.url_file)
+    start_elem = load_state(args.url_file)
+    start_chnk = start_elem // args.chunk_size
 
     # URLs we haven't scraped yet (if first run, all URLs in file)
     with open(args.url_file) as fh:
         url_entries = load_urls(fh, args.max_urls)
 
         pool = mpl.Pool(args.n_procs)
-
-        chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_chnk)), total=linecount(args.url_file)//args.chunk_size)
+        total = linecount(args.url_file)//args.chunk_size
+        print('Total chunks: ', total)
+        chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_elem)), total=total)
 
         # display already-downloaded chunks on progress bar
         chunk_iterator.update(start_chnk)
@@ -339,8 +341,8 @@ if __name__ == "__main__":
                 t2 = time.time()
                 count = archive_chunk(cid, cdata, args.output_dir, args.compress_fmt, not args.sqlite_meta)
                 tqdm.write("Archive created in {} seconds".format(time.time() - t2))
-                tqdm.write("{} out of {} URLs yielded content\n".format(count, len(chunk)))
+            tqdm.write("{} out of {} URLs yielded content\n".format(len(list(filter(lambda x: x and x[0], cdata))), len(chunk)))
 
-            save_state(args.url_file, cid)
+            save_state(args.url_file, cid * args.chunk_size)
 
         print("Done!")

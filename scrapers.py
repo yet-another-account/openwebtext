@@ -37,7 +37,7 @@ def raw_scraper(url, memoize):
         # heuristic to make downloading faster
         return None, {
             "url": url,
-            "scraper": "newspaper",
+            "scraper": "raw",
         }
 
     try:
@@ -52,12 +52,12 @@ def raw_scraper(url, memoize):
     except:
         return None, {
             "url": url,
-            "scraper": "newspaper",
+            "scraper": "raw",
         }
     if article.text == "":
         return None, {
             "url": url,
-            "scraper": "newspaper",
+            "scraper": "raw",
         }
 
     metadata = {"url": url, "elapsed": time.time() - t1, "scraper": "raw"}
@@ -100,7 +100,7 @@ def bs4_scraper(url, memoize):
         # heuristic to make downloading faster
         return None, {
             "url": url,
-            "scraper": "newspaper",
+            "scraper": "bs4",
         }
 
     try:
@@ -115,7 +115,7 @@ def bs4_scraper(url, memoize):
     except:
         return None, {
             "url": url,
-            "scraper": "newspaper",
+            "scraper": "bs4",
         }
 
     metadata = {
