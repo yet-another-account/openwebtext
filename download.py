@@ -270,7 +270,7 @@ if __name__ == "__main__":
     start_chnk = load_state(args.url_file)
 
     # URLs we haven't scraped yet (if first run, all URLs in file)
-    with open args.url_file as fh:
+    with open(args.url_file) as fh:
         url_entries = load_urls(fh, args.max_urls)
 
         pool = mpl.Pool(args.n_procs)
