@@ -7,6 +7,8 @@ exclude_domains = set([
     # image & video hosting sites
     'imgur.com',
     'redd.it',
+    'instagram.com',
+    'discord.gg',
     'gfycat.com',
     'giphy.com',
     'reddituploads.com',
@@ -43,7 +45,7 @@ exclude_domains = set([
     'timeanddate.com',
     'walmart.com',
     'roanoke.com',
-    'spotrac.com'
+    'spotrac.com',
 
     # original paper excluded wikipedia
     'wikipedia.org',
