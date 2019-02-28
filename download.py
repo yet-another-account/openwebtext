@@ -22,7 +22,7 @@ import tldextract
 from six.moves.urllib.request import urlopen
 
 from utils import mkdir, chunks, extract_month
-from scrapers import bs4_scraper, newspaper_scraper, raw_scraper
+from scrapers import bs4_scraper, newspaper_scraper, raw_scraper, linecount
 
 parser = argparse.ArgumentParser()
 parser.add_argument("url_file", type=str)
@@ -275,7 +275,7 @@ if __name__ == "__main__":
 
     pool = mpl.Pool(args.n_procs)
 
-    chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_chnk)), total=len(url_entries)//args.chunk_size)
+    chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_chnk)), total=linecount(args.url_file)//args.chunk_size)
 
     # display already-downloaded chunks on progress bar
     chunk_iterator.update(start_chnk)
