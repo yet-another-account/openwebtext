@@ -18,12 +18,15 @@ def extract_month(url_file_name):
 def chunks(l, n, s=0):
     """Yield successive n-sized chunks from l, skipping the first s chunks."""
     if isinstance(l, collections.Iterable):
-        for i in range(s * n, len(l), n):
-            chnk = []
-            for _ in range(n):
-                chnk.append(next(l))
-
+        chnk = []
+        for elem in l:
+            chnk.append(elem)
+            if len(chnk) == n:
+                yield chnk
+                chnk = []
+        if len(chnk) != 0:
             yield chnk
+
     else:
         for i in range(s * n, len(l), n):
             yield l[i : i + n]
