@@ -12,6 +12,7 @@ psaw = "*"
 tqdm = "*"
 newspaper3k = "*"
 htmlmin = "*"
+pyyaml = ">=4.2b1"
 
 [requires]
 python_version = "3.6"
