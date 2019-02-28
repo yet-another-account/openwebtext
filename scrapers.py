@@ -9,6 +9,7 @@ import newspaper
 
 from lxml.html.clean import Cleaner
 from htmlmin import minify
+from filter import should_exclude
 
 
 def find_and_filter_tag(tag, soup):
@@ -32,6 +33,9 @@ def find_and_filter_tag(tag, soup):
 
 def raw_scraper(url, memoize):
     t1 = time.time()
+    if should_exclude(url):
+        # heuristic to make downloading faster
+        return None, None
 
     try:
         cleaner = Cleaner()
@@ -53,6 +57,9 @@ def raw_scraper(url, memoize):
 
 def newspaper_scraper(url, memoize):
     t1 = time.time()
+    if should_exclude(url):
+        # heuristic to make downloading faster
+        return None, None
 
     try:
         article = newspaper.Article(url, fetch_images=False, memoize_articles=memoize)
@@ -74,6 +81,9 @@ def newspaper_scraper(url, memoize):
 
 def bs4_scraper(url, memoize):
     t1 = time.time()
+    if should_exclude(url):
+        # heuristic to make downloading faster
+        return None, None
 
     try:
         article = newspaper.Article(url, fetch_images=False, memoize_articles=memoize)
