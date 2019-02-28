@@ -170,8 +170,12 @@ def download(
 
     text, meta = scrape(url, memoize)
 
+    ext = tldextract.extract(url)
+    domain = '.'.join([x for x in ext if x])
+    meta["domain"] = domain
+
     if text is None or text.strip() == "":
-        return ("", "", fid, uid)
+        return ("", meta, fid, uid)
 
     if save_uncompressed:
         with open(text_fp, "w") as out:
@@ -179,10 +183,6 @@ def download(
         if arch_meta:
             with open(meta_fp, "w") as out:
                 json.dump(meta, out)
-
-    ext = tldextract.extract(url)
-    domain = '.'.join([x for x in ext if x])
-    meta["domain"] = domain
 
     return (text, meta, fid, uid)
 
@@ -247,9 +247,10 @@ def sqlite_conn():
         fid char(64) not null primary key,
         url varchar(2048) not null,
         domain varchar(255) not null,
-        word_count int not null,
-        elapsed int not null,
-        scraper varchar(255) not null
+        word_count int null,
+        elapsed int null,
+        scraper varchar(255) not null,
+        success boolean not null
     );
     ''')
     conn.execute('''
@@ -308,16 +309,28 @@ if __name__ == "__main__":
 
         # write metadata to sqlite
         if args.sqlite_meta:
-            for _, meta, fid, _ in filter(lambda x: x and x[0], cdata):
-                params = (
-                    fid,
-                    meta["url"],
-                    meta["domain"],
-                    meta["elapsed"],
-                    meta["word_count"],
-                    meta["scraper"]
-                )
-                cur.execute("insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper) values (?, ?, ?, ?, ?, ?)", params)
+            for text, meta, fid, _ in filter(lambda x: x, cdata):
+                if text:
+                    params = (
+                        fid,
+                        meta["url"],
+                        meta["domain"],
+                        meta["elapsed"],
+                        meta["word_count"],
+                        meta["scraper"],
+                        True
+                    )
+                else:
+                    params = (
+                        fid,
+                        meta["url"],
+                        meta["domain"],
+                        None,
+                        None,
+                        meta["scraper"],
+                        False
+                    )
+                cur.execute("insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper, success) values (?, ?, ?, ?, ?, ?, ?)", params)
             conn.commit()
 
         # archive and save this chunk to file
