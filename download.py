@@ -107,11 +107,10 @@ if not args.show_warnings:
     warnings.filterwarnings("ignore")
 
 
-def load_urls(url_file, max_urls=-1):
-    with open(url_file) as fh:
-        url_entries = enumerate(fh)
-        if max_urls != -1:
-            url_entries = list(url_entries)[:max_urls]
+def load_urls(fh, max_urls=-1):
+    url_entries = enumerate(fh)
+    if max_urls != -1:
+        url_entries = list(url_entries)[:max_urls]
     return url_entries
 
 
@@ -271,76 +270,77 @@ if __name__ == "__main__":
     start_chnk = load_state(args.url_file)
 
     # URLs we haven't scraped yet (if first run, all URLs in file)
-    url_entries = load_urls(args.url_file, args.max_urls)
+    with open args.url_file as fh:
+        url_entries = load_urls(fh, args.max_urls)
 
-    pool = mpl.Pool(args.n_procs)
+        pool = mpl.Pool(args.n_procs)
 
-    chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_chnk)), total=linecount(args.url_file)//args.chunk_size)
+        chunk_iterator = tqdm(enumerate(chunks(url_entries, args.chunk_size, start_chnk)), total=linecount(args.url_file)//args.chunk_size)
 
-    # display already-downloaded chunks on progress bar
-    chunk_iterator.update(start_chnk)
+        # display already-downloaded chunks on progress bar
+        chunk_iterator.update(start_chnk)
 
-    # process one "chunk" of args.chunk_size URLs at a time
-    for i, chunk in chunk_iterator:
-        cid = start_chnk + i + 1
+        # process one "chunk" of args.chunk_size URLs at a time
+        for i, chunk in chunk_iterator:
+            cid = start_chnk + i + 1
 
-        tqdm.write("Downloading chunk {}".format(cid))
-        t1 = time.time()
+            tqdm.write("Downloading chunk {}".format(cid))
+            t1 = time.time()
 
-        if args.timeout > 0:
-            # imap as iterator allows .next() w/ timeout.
-            # ordered version doesn't seem to work correctly.
-            # for some reason, you CANNOT track j or chunk[j] in the loop,
-            # so don't add anything else to the loop below!
-            # confusingly, chunksize below is unrelated to our chunk_size
-            chunk_iter = pool.imap_unordered(download, chunk, chunksize=1)
-            cdata = []
-            for j in range(len(chunk)):
-                try:
-                    result = chunk_iter.next(timeout=args.timeout)
-                    cdata.append(result)
-                except mpl.TimeoutError:
-                    tqdm.write("   --- Timeout Error ---   ")
-        else:
-            cdata = list(pool.imap(download, chunk, chunksize=1))
+            if args.timeout > 0:
+                # imap as iterator allows .next() w/ timeout.
+                # ordered version doesn't seem to work correctly.
+                # for some reason, you CANNOT track j or chunk[j] in the loop,
+                # so don't add anything else to the loop below!
+                # confusingly, chunksize below is unrelated to our chunk_size
+                chunk_iter = pool.imap_unordered(download, chunk, chunksize=1)
+                cdata = []
+                for j in range(len(chunk)):
+                    try:
+                        result = chunk_iter.next(timeout=args.timeout)
+                        cdata.append(result)
+                    except mpl.TimeoutError:
+                        tqdm.write("   --- Timeout Error ---   ")
+            else:
+                cdata = list(pool.imap(download, chunk, chunksize=1))
 
-        tqdm.write("{} / {} downloads timed out".format(len(chunk) - len(cdata), len(chunk)))
-        tqdm.write("Chunk time: {} seconds".format(time.time() - t1))
+            tqdm.write("{} / {} downloads timed out".format(len(chunk) - len(cdata), len(chunk)))
+            tqdm.write("Chunk time: {} seconds".format(time.time() - t1))
 
-        # write metadata to sqlite
-        if args.sqlite_meta:
-            for text, meta, fid, _ in filter(lambda x: x, cdata):
-                if text:
-                    params = (
-                        fid,
-                        meta["url"],
-                        meta["domain"],
-                        meta["elapsed"],
-                        meta["word_count"],
-                        meta["scraper"],
-                        True
-                    )
-                else:
-                    params = (
-                        fid,
-                        meta["url"],
-                        meta["domain"],
-                        None,
-                        None,
-                        meta["scraper"],
-                        False
-                    )
-                cur.execute("insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper, success) values (?, ?, ?, ?, ?, ?, ?)", params)
-            conn.commit()
+            # write metadata to sqlite
+            if args.sqlite_meta:
+                for text, meta, fid, _ in filter(lambda x: x, cdata):
+                    if text:
+                        params = (
+                            fid,
+                            meta["url"],
+                            meta["domain"],
+                            meta["elapsed"],
+                            meta["word_count"],
+                            meta["scraper"],
+                            True
+                        )
+                    else:
+                        params = (
+                            fid,
+                            meta["url"],
+                            meta["domain"],
+                            None,
+                            None,
+                            meta["scraper"],
+                            False
+                        )
+                    cur.execute("insert or ignore into metadata (fid, url, domain, elapsed, word_count, scraper, success) values (?, ?, ?, ?, ?, ?, ?)", params)
+                conn.commit()
 
-        # archive and save this chunk to file
-        if args.compress:
-            tqdm.write("Compressing...")
-            t2 = time.time()
-            count = archive_chunk(cid, cdata, args.output_dir, args.compress_fmt, not args.sqlite_meta)
-            tqdm.write("Archive created in {} seconds".format(time.time() - t2))
-            tqdm.write("{} out of {} URLs yielded content\n".format(count, len(chunk)))
+            # archive and save this chunk to file
+            if args.compress:
+                tqdm.write("Compressing...")
+                t2 = time.time()
+                count = archive_chunk(cid, cdata, args.output_dir, args.compress_fmt, not args.sqlite_meta)
+                tqdm.write("Archive created in {} seconds".format(time.time() - t2))
+                tqdm.write("{} out of {} URLs yielded content\n".format(count, len(chunk)))
 
-        save_state(args.url_file, cid)
+            save_state(args.url_file, cid)
 
-    print("Done!")
+        print("Done!")
