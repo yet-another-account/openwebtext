@@ -21,8 +21,8 @@ import tldextract
 # for backward compatibility
 from six.moves.urllib.request import urlopen
 
-from utils import mkdir, chunks, extract_month
-from scrapers import bs4_scraper, newspaper_scraper, raw_scraper, linecount
+from utils import mkdir, chunks, extract_month, linecount
+from scrapers import bs4_scraper, newspaper_scraper, raw_scraper
 
 parser = argparse.ArgumentParser()
 parser.add_argument("url_file", type=str)
