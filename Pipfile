@@ -11,6 +11,7 @@ praw = "*"
 psaw = "*"
 tqdm = "*"
 newspaper3k = "*"
+htmlmin = "*"
 
 [requires]
 python_version = "3.6"

@@ -2,6 +2,8 @@
 
 This project is a clone of the GPT-2 WebText dataset as outlined in the [OpenAI paper](https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf). This project is still heavily WIP.
 
+Huge thanks to [jcpeterson](https://github.com/jcpeterson/openwebtext) for letting me use his download code. His version of OpenWebText is super well written, so please check it out!
+
 ## Dependencies
 
 Pipenv, Python 3,
