@@ -110,7 +110,7 @@ def should_exclude(url):
 
 if __name__ == '__main__':
     with open('urls.txt') as urls, open('urls-filtered.txt', 'w') as out:
-        for line in tqdm.tqdm(list(urls)):
+        for line in tqdm.tqdm(urls, total=84532938):
             line = line.strip()
             if should_exclude(line):
                 continue

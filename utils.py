@@ -5,6 +5,7 @@ import os
 import os.path as op
 import tarfile
 import re
+import collections
 
 
 def extract_month(url_file_name):
@@ -16,8 +17,16 @@ def extract_month(url_file_name):
 
 def chunks(l, n, s=0):
     """Yield successive n-sized chunks from l, skipping the first s chunks."""
-    for i in range(s * n, len(l), n):
-        yield l[i : i + n]
+    if isinstance(l, collections.Iterable):
+        for i in range(s * n, len(l), n):
+            chnk = []
+            for _ in range(n):
+                chnk.append(next(l))
+
+            yield chnk
+    else:
+        for i in range(s * n, len(l), n):
+            yield l[i : i + n]
 
 
 def extract_archive(archive_fp, outdir="."):

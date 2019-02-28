@@ -109,9 +109,9 @@ if not args.show_warnings:
 
 def load_urls(url_file, max_urls=-1):
     with open(url_file) as fh:
-        url_entries = list(enumerate(fh))
+        url_entries = enumerate(fh)
         if max_urls != -1:
-            url_entries = url_entries[:max_urls]
+            url_entries = list(url_entries)[:max_urls]
     return url_entries
 
 
