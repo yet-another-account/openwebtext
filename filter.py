@@ -129,8 +129,8 @@ def should_exclude(url):
 
 
 if __name__ == '__main__':
-	url_file = 'urls.txt.bak'
-	filtered_file = 'urls-test.txt'
+	url_file = 'urls.txt'
+	filtered_file = 'urls-filtered.txt'
 
 	with open(url_file) as urls, open(filtered_file, 'w') as out:
 		url_len = 0
