@@ -1,6 +1,7 @@
 import tldextract
 import tqdm
 import re
+from utils import linecount
 
 # https://stackoverflow.com/questions/7160737/python-how-to-validate-a-url-in-python-malformed-or-not
 url_regex = re.compile(
@@ -132,10 +133,7 @@ if __name__ == '__main__':
 	filtered_file = 'urls-filtered.txt'
 
 	with open(url_file) as urls, open(filtered_file, 'w') as out:
-		url_len = 0
-		for line in urls:
-			url_len += 1
-		urls.seek(0)
+		url_len = linecount(url_file)
 		print("URL file is", url_len, "URLs long.")
 		url_set = set()
 		for line in tqdm.tqdm(urls, total=url_len):
