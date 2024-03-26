@@ -109,8 +109,8 @@ exclude_extensions = (
 def should_exclude(url):
 
 	ext = tldextract.extract(url)
-	domain = '.'.join([x for x in ext if x])
-	basedomain = '.'.join(ext[-2:])
+	domain = ext.fqdn
+	basedomain = ext.registered_domain
 
 	# Ignore non-URLs
 	if len(url) <= 8 or ' ' in url or re.match(url_regex, url) is None:
